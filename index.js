@@ -1,5 +1,6 @@
 const express=require('express')
 const app=express()
+app.use(express.json());
 const courses=[
     {
         id:1,
@@ -10,7 +11,7 @@ const courses=[
         name:'Java Course'
     },
     {
-        id:1,
+        id:3,
         name:'Express Course'
     }
 ]
@@ -23,6 +24,18 @@ app.get('/courses/:id',(req,res)=>{
         res.status(404).end('not found')
     }
     res.json(course[0])
+})
+app.post('/courses',(req,res)=>{
+    let id=courses.length+1
+    const data=req.body
+   if( !data.name || data.length<1 || data.length>1){
+    res.status(422).end('invalid data')
+   }
+    courses.push({
+        name:data.name,
+        id
+    })
+    res.json({msg:'course added successfully'})
 })
 app.listen('5000',()=>{
     console.log('listening on 5000')
