@@ -15,7 +15,14 @@ const courses=[
     }
 ]
 app.get('/courses',(_,res)=>{
-    res.end(JSON.stringify(courses))
+    res.json(courses)
+})
+app.get('/courses/:id',(req,res)=>{
+    let course=courses.filter((course)=>course.id===Number(req.params.id))
+    if(course.length===0){
+        res.status(404).end('not found')
+    }
+    res.json(course[0])
 })
 app.listen('5000',()=>{
     console.log('listening on 5000')
