@@ -1,71 +1,68 @@
-const { courses } = require('../data/courses')
-const {validationResult } = require('express-validator')
+const { validationResult } = require('express-validator')
+const course = require('./courses.model')
 
-const addCourse = (req, res) => {
+const addCourse = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.json(validationResult(req).errors)
     }
-    courses.push({
-        id: courses.length + 1,
-        name: req.body.name,
+    console.log(req.body)
+    const newCourse = await new course({
+        title: req.body.title,
         price: req.body.price
-    })
+    }
+    )
+    await newCourse.save()
     res.json({ msg: 'course added successfully' })
 }
 
-const getCourses = (_, res) => {
+
+const getCourses = async (_, res) => {
+    const courses = await course.find();
     return res.status(200).json(courses)
 }
 
-const editCourse = (req, res) => {
+
+const editCourse = async (req, res) => {
     let id = req.params.id
-    if (!id) {
-        res.status(400).json({ msg: 'please provide the course ID' })
-
-
+    try {
+       const updatedCourse= await course.findByIdAndUpdate(id, { $set: {...req.body}},{new:true})
+        return res.json({msg:"updated",course:updatedCourse})
     }
-    if (!req?.body?.name && !req?.body?.price) {
-        res.status(400).json({ msg: 'please specifiy course price or title' })
-
+    catch (e){
+        return res.status(400).json({ msg: e.message })
     }
-    let errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        return res.json(errors)
-    }
-
-    let course = courses.findIndex((course) => course.id === +id)
-    if (course === -1) {
-        return res.status(400).json('course not found')
-    }
-    courses[course].name = req.body.name ? req.body.name : courses[course].name
-    courses[course].price = req.body.price ? req.body.price : courses[course].price
-    res.json({ msg: 'updated' })
 }
 
-const deleteCourse = (req, res) => {
+const deleteCourse = async (req, res) => {
     let id = req.params.id
+    try{
+        let coruseResult=await course.findByIdAndDelete(id)
+        return res.json({msg:'course deleted'},coruseResult)
+    }
+    catch(e){
+        return res.status(400).json({mag:e.message})
+    }
     
-    if (!id) {
-        return res.status(404).json('NO ID WAS PROVIDED')
-    }
-    let beforeLength = courses.length
-    let newCourses=courses.filter((course) => course.id !== +id)
-    let afterLength = newCourses.length
-    if (afterLength === beforeLength) {
-        return res.status(404).json('the course was not found')
-    }
-
-    console.log(courses)
-    res.json({ msg: 'course deleted' })
 }
 
-const getSingleCourse = (req, res) => {
-    let course = courses.filter((course) => course.id === Number(req.params.id))
-    if (course.length === 0) {
-        res.status(404).end('not found')
+const getSingleCourse = async (req, res) => {
+
+
+    try {
+        const courseResult = await course.findById(req.params.id)
+        if (!courseResult) {
+            return res.status(404).json({ msg: "Course not found" }) // if the find by id doenst throw an error, then the id passed is valid object id but id doesnt exist if its null so its not found
+
+        }
+        return res.json(courseResult)
     }
-    res.json(course[0])
+    catch {
+        return res.status(400).json({ msg: "not valid ID" }) // if the findbyid throws an error that means it is not a valid object id
+    }
+
+
+
 }
 
 module.exports = {
