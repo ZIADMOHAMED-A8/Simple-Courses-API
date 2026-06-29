@@ -21,31 +21,41 @@ const getUsers = asyncWrapper(async (req, res, next) => {
 
 
 const register = asyncWrapper(async (req, res, next) => {
-    const { firstName, lastName, email, password,role } = req.body
-    const checkUser = await user.find({ email: email })
-    console.log(checkUser, 'user')
-    if (checkUser.length > 0) {
-        const error = new AppError('User already exists')
-        return next(error)
+    console.log(req.file,"REQ FILE"); // شوف الصورة وصلت ولا لأ
+
+    const { firstName, lastName, email, password, role } = req.body;
+
+    const checkUser = await user.findOne({ email });
+
+    if (checkUser) {
+        return next(new AppError("User already exists"));
     }
-    const newUser = await new user({
+
+    const newUser = new user({
         firstName,
         lastName,
         email,
         password,
-        role
-    })
-    const token = await generateJwt({ email, id: newUser._id })
+        role,
+        avatar: req.file?.filename 
+    });
 
-    newUser.token = token
-    await newUser.save()
+    const token = await generateJwt({
+        email,
+        id: newUser._id
+    });
+
+    newUser.token = token;
+
+    await newUser.save();
+
     res.status(201).json({
         status: httpStatusText.SUCCESS,
         data: {
             user: newUser
         }
-    })
-})
+    });
+});
 
 const login = asyncWrapper(async (req, res, next) => {
     const { email, password } = req.body

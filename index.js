@@ -2,11 +2,13 @@ const express = require('express')
 const app = express()
 const cors=require('cors')
 const httpStatusText=require('./utils/httpStatusText')
+const path=require('path')
 app.use(cors())
 app.use(express.json());
 app.use((error,req,res,next)=>{
     res.json({status:httpStatusText})
 })
+app.use('/uploads',express.static(path.join(__dirname,'uploads')))
 const url=process.env.DB_URL
 const port=process.env.PORT
 const mongoose=require('mongoose')
