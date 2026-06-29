@@ -26,10 +26,11 @@ const { getUsers,
     register,
     login } = require('./users.controller')
 const verifyToken = require('../moddleware/verifyToken')
-const { verifyManager } = require('../moddleware/verofyRoles')
+const { authorize } = require('../moddleware/verofyRoles')
 const AppError = require('../utils/appError')
+const roles = require('../utils/rolesArray')
 userRouter.route('/')
-    .get(verifyToken,verifyManager,getUsers)
+    .get(verifyToken,authorize([roles.user]),getUsers)
 
 userRouter.route('/register')
     .post(upload.single('avatar'),register)
