@@ -14,15 +14,14 @@ mongoose.connect(url).then(()=>{
     console.log('mongo db connected')
 })
 const coursesRouter=require('./courses/courses.routes')
+const userRouter = require('./users/users.routes')
 app.use('/courses',coursesRouter)
+app.use('/user',userRouter)
 app.all('*splat',(req,res,next)=>{
     res.status(404).json({status:httpStatusText.ERROR,msg:'this resoruse is not avaialbe'})
 })
 app.use((err, req, res, next) => {
-    console.log("errorrrrrr",Object.entries(err.message));
-    
-   
-    res.status(500).json({
+       res.status(500).json({
         status: httpStatusText.FAIL,
         message: err.message
     });
