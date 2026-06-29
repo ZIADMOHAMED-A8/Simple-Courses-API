@@ -32,6 +32,10 @@ const user = mongoose.Schema({
         enum:Object.values(roles),
         require:true,
         default:roles.user
+    },
+    avatar:{
+        type:String,
+        default:'/uploads/profile.jpg'
     }
 })
 const bcrypt = require("bcryptjs");
