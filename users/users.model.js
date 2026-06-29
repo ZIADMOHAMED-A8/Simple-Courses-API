@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const { validate } = require("../courses/courses.model");
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const roles=require('../utils/rolesArray')
 const user = mongoose.Schema({
     firstName: {
         required: true,
@@ -25,6 +26,12 @@ const user = mongoose.Schema({
     },
     token:{
         type:String
+    },
+    role:{
+        type:String,
+        enum:Object.values(roles),
+        require:true,
+        default:roles.user
     }
 })
 const bcrypt = require("bcryptjs");

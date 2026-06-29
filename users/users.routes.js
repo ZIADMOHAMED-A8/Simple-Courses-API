@@ -4,8 +4,9 @@ const { getUsers,
     register,
     login } = require('./users.controller')
 const verifyToken = require('../moddleware/verifyToken')
+const { verifyManager } = require('../moddleware/verofyRoles')
 userRouter.route('/')
-    .get(verifyToken,getUsers)
+    .get(verifyToken,verifyManager,getUsers)
 
 userRouter.route('/register')
     .post(register)

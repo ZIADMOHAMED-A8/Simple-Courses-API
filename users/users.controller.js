@@ -21,7 +21,7 @@ const getUsers = asyncWrapper(async (req, res, next) => {
 
 
 const register = asyncWrapper(async (req, res, next) => {
-    const { firstName, lastName, email, password } = req.body
+    const { firstName, lastName, email, password,role } = req.body
     const checkUser = await user.find({ email: email })
     console.log(checkUser, 'user')
     if (checkUser.length > 0) {
@@ -32,7 +32,8 @@ const register = asyncWrapper(async (req, res, next) => {
         firstName,
         lastName,
         email,
-        password
+        password,
+        role
     })
     const token = await generateJwt({ email, id: newUser._id })
 
@@ -62,7 +63,6 @@ const login = asyncWrapper(async (req, res, next) => {
         const error = new AppError('User not found')
         next(error)
     }
-    console.log(token)
     const isSame = await bcrypt.compare(password, existingUser.password)
     if (isSame === false) {
         const error = new AppError('wrong password')
