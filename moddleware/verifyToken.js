@@ -9,9 +9,6 @@ async function verifyToken(req,res,next){
     }
      token=token.split(' ')[1]
      console.log(process.env.jwt_secret_key)
-     const decodedToken=jwt.verify(token,process.env.jwt_secret_key)
-     console.log(decodedToken)
-     req.user=decodedToken
      next()
 }
 module.exports=verifyToken

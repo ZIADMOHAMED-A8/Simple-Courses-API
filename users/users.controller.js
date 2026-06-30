@@ -42,7 +42,8 @@ const register = asyncWrapper(async (req, res, next) => {
 
     const token = await generateJwt({
         email,
-        id: newUser._id
+        id: newUser._id,
+        role
     });
 
     newUser.token = token;

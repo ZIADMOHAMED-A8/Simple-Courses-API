@@ -94,6 +94,7 @@ const editCourse = asyncWrapper(async (req, res, next) => {
 });
 
 const deleteCourse = asyncWrapper(async (req, res, next) => {
+    console.log(req.params.id,"id not being")
     const deletedCourse = await course.findByIdAndDelete(req.params.id);
 
     if (!deletedCourse) {

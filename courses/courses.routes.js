@@ -1,21 +1,19 @@
 const express = require('express')
 const { body } = require('express-validator')
-
 const rotuer=express.Router()
 let {addCourse,getCourses,editCourse,deleteCourse,getSingleCourse}=require('./courses.controller')
+const { authorize } = require('../moddleware/verofyRoles')
+const roles = require('../utils/rolesArray')
+const { addCourseSchema, getCoursesSchema, getSingleCourseSchema, editCourseSchema,deleteCourseSchema } = require('../schemas/coursesSchema')
+
+const { validate } = require('../moddleware/validateSchemas')
+const verifyToken = require('../moddleware/verifyToken')
 rotuer.route('/')
-.get( getCourses)
-.post(body('title').notEmpty().withMessage('title is required')
-    .isLength({ min: 2 }).withMessage('title should be more than 2 charchets')
-    , body('price').notEmpty().withMessage('price must be provided')
-        .isInt({ min: 1 }).withMessage('your price is not valid')
-    , addCourse)
-
-
-
-rotuer.route('/:id').get(getSingleCourse )
-.patch( editCourse)
-.delete(deleteCourse)
+.get(verifyToken,authorize([roles.manager]),validate(getCoursesSchema),getCourses)
+.post(validate(addCourseSchema),addCourse)
+rotuer.route('/:id').get(validate(getSingleCourseSchema),getSingleCourse)
+.patch(validate(editCourseSchema),editCourse)
+.delete(validate(deleteCourseSchema),authorize([roles.admin,roles.manager]),deleteCourse)
 
 
 
