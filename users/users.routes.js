@@ -24,7 +24,8 @@ const upload=multer({storage:diskStorage,
 const userRouter = express.Router()
 const { getUsers,
     register,
-    login } = require('./users.controller')
+    login, 
+    getAnotherUser} = require('./users.controller')
 const verifyToken = require('../moddleware/verifyToken')
 const { authorize } = require('../moddleware/verofyRoles')
 const AppError = require('../utils/appError')
@@ -33,6 +34,9 @@ const { validate } = require('../moddleware/validateSchemas')
 const { signUpSchema, loginSchema } = require('../schemas/auth.schema')
 userRouter.route('/')
     .get(verifyToken,verifyToken,authorize([roles.admin,roles.manager]),getUsers)
+
+userRouter.route('/:id')
+    .get(verifyToken,getAnotherUser)
 
 userRouter.route('/register')
     .post(validate(signUpSchema),upload.single('avatar'),register)

@@ -3,24 +3,15 @@ const course = require("./courses.model");
 const asyncWrapper = require("../moddleware/asyncWrapper");
 const { SUCCESS, FAIL } = require("../utils/httpStatusText");
 const AppError = require("../utils/appError");
+const decodeToken = require("../utils/decodeToken");
 
 const addCourse = asyncWrapper(async (req, res, next) => {
-    const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return next(
-            new AppError(
-                "Validation failed",
-                400,
-                FAIL,
-                errors.array()
-            )
-        );
-    }
-
+    const {id}=decodeToken(req)
     const newCourse = new course({
         title: req.body.title,
         price: req.body.price,
+        user:id
     });
 
     await newCourse.save();
