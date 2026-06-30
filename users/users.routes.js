@@ -26,16 +26,19 @@ const { getUsers,
     register,
     login } = require('./users.controller')
 const verifyToken = require('../moddleware/verifyToken')
-const { verifyManager } = require('../moddleware/verofyRoles')
+const { authorize } = require('../moddleware/verofyRoles')
 const AppError = require('../utils/appError')
+const roles = require('../utils/rolesArray')
+const { validate } = require('../moddleware/validateSchemas')
+const { signUpSchema, loginSchema } = require('../schemas/auth.schema')
 userRouter.route('/')
-    .get(verifyToken,verifyManager,getUsers)
+    .get(verifyToken,verifyToken,authorize([roles.admin,roles.manager]),getUsers)
 
 userRouter.route('/register')
-    .post(upload.single('avatar'),register)
+    .post(validate(signUpSchema),upload.single('avatar'),register)
 
 userRouter.route('/login')
-    .post(login)
+    .post(validate(loginSchema),login)
 
 
 module.exports = userRouter
