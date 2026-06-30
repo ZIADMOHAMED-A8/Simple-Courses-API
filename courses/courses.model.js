@@ -8,6 +8,10 @@ const courseSchema=new mongoose.Schema({
     price:{
         type:Number,
         required:true
+    },
+    user:{
+        type:mongoose.Schema.ObjectId,
+        ref:'User'
     }
 })
 

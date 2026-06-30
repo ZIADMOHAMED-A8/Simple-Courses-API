@@ -93,9 +93,19 @@ const login = asyncWrapper(async (req, res, next) => {
     })
 
 })
-
+const getAnotherUser=async (req,res,next)=>{
+    const id=req.params.id
+    const userSearched=await user.findById(id)
+    console.log(userSearched)
+    if(!userSearched){
+        const error=new AppError('user not found')
+        return next(error)
+    }
+    res.status(200).json(userSearched)
+}
 module.exports = {
     getUsers,
     register,
-    login
+    login,
+    getAnotherUser
 }
