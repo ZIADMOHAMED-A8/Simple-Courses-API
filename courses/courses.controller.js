@@ -104,10 +104,26 @@ const deleteCourse = asyncWrapper(async (req, res, next) => {
     });
 });
 
+const getCoursesByUser=asyncWrapper(async(req,res,next)=>{
+    const {id}=req.params
+    if(!id){
+        const error=AppError('please provide the User id')
+        next(error)
+    }
+    const courses=await course.find({user:id})
+    res.status(200).json({
+        status:SUCCESS,
+        data:{
+            courses:courses
+        }
+    })
+})
+
 module.exports = {
     addCourse,
     getCourses,
     getSingleCourse,
     editCourse,
     deleteCourse,
+    getCoursesByUser
 };

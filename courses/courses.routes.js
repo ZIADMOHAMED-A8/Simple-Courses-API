@@ -1,7 +1,7 @@
 const express = require('express')
 const { body } = require('express-validator')
 const rotuer=express.Router()
-let {addCourse,getCourses,editCourse,deleteCourse,getSingleCourse}=require('./courses.controller')
+let {addCourse,getCourses,editCourse,deleteCourse,getSingleCourse, getCoursesByUser}=require('./courses.controller')
 const { authorize } = require('../moddleware/verofyRoles')
 const roles = require('../utils/rolesArray')
 const { addCourseSchema, getCoursesSchema, getSingleCourseSchema, editCourseSchema,deleteCourseSchema } = require('../schemas/coursesSchema')
@@ -14,8 +14,10 @@ rotuer.route('/')
 .post(validate(addCourseSchema),addCourse)
 rotuer.route('/:id').get(validate(getSingleCourseSchema),getSingleCourse)
 .patch(validate(editCourseSchema),editCourse)
-.delete(validate(deleteCourseSchema),deleteCourse,authorize([roles.manager]))
+.delete(validate(deleteCourseSchema),authorize([roles.manager]),deleteCourse)
 
+rotuer.route('/user/:id')
+    .get(validate(deleteCourseSchema),getCoursesByUser)
 
 
 

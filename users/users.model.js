@@ -43,7 +43,7 @@ const bcrypt = require("bcryptjs");
 user.pre("save", async function () {
 
     if (this.isModified("password")) {
-        this.password = await bcrypt.hash(this.password, 10);
+        this.password =await  bcrypt.hash(this.password, 10);
     }
     if (this.isModified("refreshToken")) {
         this.refreshToken = await bcrypt.hash(this.refreshToken, 10);

@@ -8,6 +8,7 @@ const generateJwt = require("../utils/generateJwt");
 const verifyToken = require("../moddleware/verifyToken");
 const { findByIdAndUpdate } = require("../courses/courses.model");
 const decodeToken = require("../utils/decodeToken");
+const { hash } = require("../utils/hashing");
 const getUsers = asyncWrapper(async (req, res, next) => {
     const query = req.query
     const page = query.page
@@ -50,15 +51,15 @@ const register = asyncWrapper(async (req, res, next) => {
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    // Convert to plain JS object to strip out Mongoose internal circular weights
+  
     const userResponse = newUser.toObject();
-    delete userResponse.password; // Good practice: hide password hash from response
+    delete userResponse.password; 
 
     res.status(201).json({
         status: httpStatusText.SUCCESS,
         data: {
             user: {
-                ...userResponse, // FIXED: Uses plain object of the created user instance
+                ...userResponse, 
                 accessToken: accessToken,
                 refreshToken
             }
@@ -93,22 +94,24 @@ const login = asyncWrapper(async (req, res, next) => {
         role: existingUser.role
     });
     
+    const hashedToken= await hash(refreshToken);
   
     
     const updatedUser = await user.findByIdAndUpdate(
         existingUser._id,
-        { refreshToken: refreshToken },
+        { refreshToken: hashedToken },
         { new: true }
-    ).lean(); // FIXED: .lean() gives us a plain object instantly
+    ).lean(); 
 
-    delete updatedUser.password; // Good practice: hide password hash
+    delete updatedUser.password; 
 
     res.send({
         message: 'Login success', 
         data: {
             user: {
-                ...updatedUser, // FIXED: Spreading a plain object now works cleanly
-                accessToken: accessToken
+                ...updatedUser, 
+                accessToken: accessToken,
+                refreshToken
             }
         }
     });
@@ -129,13 +132,14 @@ const refresh=async(req,res,next)=>{
     console.log('asdadsadasdsa')
     console.log(req.headers.authorization.split(' ')[1])
     console.log('breakpoint1')
-    const {id}=decodeToken(req)
+    const {id}=decodeToken(req,"refresh")
     console.log('breakpoint2')
 
     const existingUser=await user.findById(id)
-    console.log(existingUser)
+    console.log(existingUser.refreshToken,"refresh token")
     
     const isMatched=await bcrypt.compare(req.headers.authorization.split(' ')[1],existingUser.refreshToken);
+    console.log(isMatched)
     if(!isMatched){
         const error=new AppError('invalid refresh token')
         return next(error)
@@ -147,8 +151,9 @@ const refresh=async(req,res,next)=>{
         id: existingUser._id,
         role:existingUser.role
     });
-
-    await user.findByIdAndUpdate(id,{refreshToken})
+    
+    const hashedToken= await hash(refreshToken);
+    await user.findByIdAndUpdate(id,{refreshToken:hashedToken})
     res.status(200).json({
         accessToken,
         refreshToken

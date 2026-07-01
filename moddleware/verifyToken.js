@@ -7,6 +7,7 @@ async function verifyToken(req,res,next){
         const error=new AppError('no token provided')
         return next(error)
     }
+    // jwt.verify(token,secret_key)
      token=token.split(' ')[1]
      console.log(process.env.jwt_secret_key)
      next()
