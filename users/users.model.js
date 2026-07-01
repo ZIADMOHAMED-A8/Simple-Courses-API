@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const { validate } = require("../courses/courses.model");
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const roles=require('../utils/rolesArray')
+const roles = require('../utils/rolesArray')
 const user = mongoose.Schema({
     firstName: {
         required: true,
@@ -24,26 +24,31 @@ const user = mongoose.Schema({
         required: true,
         type: String,
     },
-    token:{
-        type:String
+    refreshToken: {
+        type: String
     },
-    role:{
-        type:String,
-        enum:Object.values(roles),
-        require:true,
-        default:roles.user
+    role: {
+        type: String,
+        enum: Object.values(roles),
+        require: true,
+        default: roles.user
     },
-    avatar:{
-        type:String,
-        default:'/uploads/profile.jpg'
+    avatar: {
+        type: String,
+        default: '/uploads/profile.jpg'
     }
 })
 const bcrypt = require("bcryptjs");
 
 user.pre("save", async function () {
 
-    if (!this.isModified("password")) return;
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    if (this.isModified("refreshToken")) {
+        this.refreshToken = await bcrypt.hash(this.refreshToken, 10);
+    }
 
-    this.password = await bcrypt.hash(this.password, 10);
+
 });
-module.exports=mongoose.model('users',user)
+module.exports = mongoose.model('users', user)

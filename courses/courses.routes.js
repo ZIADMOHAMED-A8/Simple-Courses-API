@@ -8,13 +8,13 @@ const { addCourseSchema, getCoursesSchema, getSingleCourseSchema, editCourseSche
 
 const { validate } = require('../moddleware/validateSchemas')
 const verifyToken = require('../moddleware/verifyToken')
+const { refresh } = require('../users/users.controller')
 rotuer.route('/')
-.get(verifyToken,authorize([roles.manager]),validate(getCoursesSchema),getCourses)
+.get(verifyToken,authorize([roles.admin,roles.manager]),validate(getCoursesSchema),getCourses)
 .post(validate(addCourseSchema),addCourse)
 rotuer.route('/:id').get(validate(getSingleCourseSchema),getSingleCourse)
 .patch(validate(editCourseSchema),editCourse)
-.delete(validate(deleteCourseSchema),authorize([roles.admin,roles.manager]),deleteCourse)
-
+.delete(validate(deleteCourseSchema),deleteCourse,authorize([roles.manager]))
 
 
 
